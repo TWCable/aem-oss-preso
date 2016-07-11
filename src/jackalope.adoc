@@ -1,0 +1,105 @@
+== !Logo
+
+image::jackalope.png[height=360]
+
+== Simple test doubles for the JCR/Sling/CQ
+
+== !Focus
+
+Focus on simplicity, speed and clarity
+
+== Basic Jackalope Examples
+
+== !Example
+
+[.em07]
+--
+```groovy
+import static com.twcable.jackalope.JCRBuilder.node as n 
+import static com.twcable.jackalope.JCRBuilder.property as p 
+import static com.twcable.jackalope.JCRBuilder.repository  
+```
+--
+
+
+[.cue]
+****
+Using Groovy’s “import as” to get rid of some noise
+****
+
+== !Example2
+
+[.em07]
+--
+```groovy
+ def repository = repository( 
+  n("content",
+    n("test1",
+      n("callingrates",
+        n("intl-direct-dial",
+          p("sling:resourceType",
+            "admin/components/content/callingratetable"),
+          n("france",
+            p("sling:resourceType",
+              "admin/components/content/callingrate"),
+            p("additional-minute-rate", "0.60"))))))).build()
+
+def resolver = new SimpleResourceResolverFactory(repository).
+                     administrativeResourceResolver 
+def resource = resolver.getResource("/content/test1/" +
+                  "callingrates/intl-direct-dial")  
+```
+--
+
+
+[.cue]
+****
+Using Groovy’s properties support to get rid of some noise
+
+Extremely easy to physically see the structure/hierarchy. Could have done n(“/content/test1/callingrates/intl-direct-dial”), but broke it apart to make the hierarchy obvious.
+
+Handles taking care of Nodes as Resources
+****
+
+== !Example
+
+[.em06]
+--
+```groovy
+import static com.twcable.jackalope.JCRBuilder.node
+ import static com.twcable.jackalope.JCRQueryBuilder.query
+ import static com.twcable.jackalope.JCRQueryBuilder.result
+
+  given:
+ def node = node("result").build()
+ def session = node.session  
+
+JCRQueryBuilder.queryManager(session,
+                             query("SELECT ...",
+                                   JCR_SQL2, result(node))
+).build()
+
+ when:
+ def queryResult = session.workspace.queryManager.
+                    createQuery("SELECT ...", JCR_SQL2).execute() 
+
+ then:
+ queryResult.nodes.first() == node
+```
+--
+
+[.cue]
+****
+A Session is automatically created for the Node, and the Session is implicitly part of a Workspace
+
+The QueryManager is "`attached`" to the Session that gets created for the Node
+****
+
+== Primary Jackalope Alternatives
+
+* https://github.com/Citytechinc/prosper[CITYTECH's Prosper]
+** Very Groovy and dynamic DSL
+
+* https://sling.apache.org/documentation/development/jcr-mock.html[Sling JCR Mocks]
+** Essentially the "`normal`" API
+** Verbose and does not "`show`" the structure

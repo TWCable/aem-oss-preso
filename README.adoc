@@ -4,8 +4,6 @@ A presentation on Charter Communication's (formerly Time Warner Cable) Open Sour
 
 Currently under development.
 
-////
-
 To view go to https://TWCable.github.io/aem-oss-preso/
 
 # Building
@@ -21,6 +19,8 @@ bundle && npm i
 ```
 gulp
 ```
+
+Open `public/index.html` to view.
 
 ## Local Web server
 
@@ -44,5 +44,3 @@ gulp deploy
 
 * The presentation content is [CC Attribution 4.0 licensed](http://creativecommons.org/licenses/by/4.0/), Copyright (C) 2016 Jim J. Moore and John Zeren for Charter Communication Corp.
 * Bespoke.js is MIT licensed
-
-////

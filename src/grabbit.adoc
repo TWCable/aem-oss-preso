@@ -1,0 +1,414 @@
+== Grabbit
+
+== Fast Content Copy for AEM
+
+== Background
+
+== The Primary Alternatives
+
+* Package Manager
+* `vlt rcp` (and Mark Adamcin's "`recap`")
+
+== Package Manager Pros
+
+* it works out the box
+* handles all the edge-cases
+* well documented (well, kinda-sorta)
+* fast
+
+== Package Manager Cons
+
+* no (realistic) deltas
+* **_EXTREMELY_** space-inefficient
+** sheer space
+** generates a lot of extra I/O
+* gets wonky with packages in the GB range
+
+== vlt rcp Pros
+
+* it works out the box
+* handles all the edge-cases
+* space efficient
+* not too horribly slow when all machines are on the same network
+
+== vlt rcp Cons
+
+* very sensitive to network latency (terrible on a WAN/cloud)
+* when something goes wrong, the error messages are pretty bad
+
+
+== What is Grabbit?
+
+== !What it is
+
+Grabbit is focussed on speed, reliability and monitoring
+
+== !Replace?
+
+Not intended to _replace_ Packages
+
+Should do the ~90% of keeping content up-to-date
+
+== Grabbit Pros
+
+* data-transfer is very, very optimized
+** network topology matters very little
+** depending on the kind of data and network, generally see 200%-1,000% faster
+   than `vlt rcp`
+* space efficient
+* deltas
+* clear-before-write
+
+== Grabbit Cons
+
+* "`edge cases`" are not fully supported
+** if you can't write with the JCR API (e.g., Users/Groups) it may not work
+** Vault (Package Manager and `vlt rcp`) are part of Jackrabbit, so it will
+   always receive the most love for backwards compatibility, changes to
+   implementation details in the JCR, etc.
+* large (multi-GB) paths require special handling
+
+== Installation
+
+* Install two packages on both the Client and Server AEM/CQ machines
+**  https://bintray.com/artifact/download/twcable/aem/dependencies/Sun-Misc-Fragment-Bundle-1.0.0.zip[Sun-Misc-Fragment-Bundle-1.0.0.zip]
+** https://bintray.com/twcable/aem/Grabbit/_latestVersion[Grabbit.zip]
+
+== !Sequence
+
+[.fullheight]
+--
+[plantuml,grabbit-top-sequence,svg]
+....
+hide footbox
+actor "User Agent" as User
+participant "Grabbit Client" as Client
+participant "Grabbit Server" as Server
+
+User -> Client: job request
+Client -> User: job ids
+
+loop for each job (path)
+    Client -> Server: data request
+    Server -> Client: stream of data
+end
+
+User --> Client: get status of job
+Client --> User: status of job
+....
+--
+
+
+== PUT /grabbit/job
+
+== !Sample Configuration
+
+[.em07]
+--
+```yaml
+# Information for connecting to the source content
+serverUsername : '<username>'
+serverPassword : '<password>'
+serverHost : some.other.server
+serverPort : 4502
+
+deltaContent : true # default for all the paths
+
+# A reference to the standard set of workflow configuration ids that
+# we want to turn off when working with DAM assets.
+damWorkflows: &ourDamWorkflows
+  - /etc/workflow/launcher/config/update_asset_mod
+  - /etc/workflow/launcher/config/update_asset_create
+  - /etc/workflow/launcher/config/dam_xmp_nested_writeback
+  - /etc/workflow/launcher/config/dam_xmp_writeback
+```
+--
+
+== !Sample2
+[.em07]
+--
+```yaml
+# Each of the paths to include in the copy
+pathConfigurations :
+  -
+    path : /content/someContent
+  -
+    path : /content/someOtherContent
+    excludePaths: [ someExcludeContent ]
+  -
+    path : /content/dam/someDamContent
+    excludePaths :
+      - someContent/someExcludeContent
+      - someContent/someOtherExcludeContent
+    workflowConfigIds : *ourDamWorkflows
+```
+--
+
+== !Job status
+
+GET
+/grabbit/job/all.json
+
+GET
+/grabbit/job/<id>.json
+
+== !Status Resp
+
+[.em07]
+--
+```json
+{
+    "transactionID": 4364570344328332300,
+    "jobExecutionId": 3416428771481128000,
+    "jcrNodesWritten": 1,
+    "exitStatus": {
+        "exitDescription": "",
+        "exitCode": "COMPLETED",
+        "running": false
+    },
+    "endTime": "2016-04-25T16:01:46+0000",
+    "timeTaken": 4212,
+    "path": "/content/campaigns/jcr:content",
+    "startTime": "2016-04-25T16:01:42+0000"
+}
+```
+--
+
+== Google's Protocol Buffers
+
+Pros
+
+* efficient for both space and time
+** binary w/ compression
+* extensible
+* battle-tested
+
+== Google's Protocol Buffers
+
+Cons
+
+* Not meant for large (MB) blobs of data
+
+== !Definition
+
+[.em06]
+--
+```
+message Node {
+    required string name = 1;
+    required Properties properties = 2;
+    repeated Node mandatoryChildNode = 3;
+}
+message Properties {
+    repeated Property property = 1;
+}
+message Property {
+    required string name = 1;
+    required int32 type = 2;
+    optional Value value = 3;
+    optional Values values = 4;
+}
+message Values {
+    repeated Value value = 1;
+}
+message Value {
+    optional string stringValue = 1;
+    optional bytes bytesValue = 2;
+}
+```
+--
+
+== Processing the Jobs
+
+
+== !Job1
+
+[.em08]
+--
+```xml
+<batch:job id="clientJob"
+    xmlns="http://www.springframework.org/schema/batch"
+    job-repository="clientJobRepository">
+
+    <!-- ... -->
+
+</batch:job>
+```
+--
+
+== !Job2
+
+[.em08]
+--
+```xml
+<batch:decision id="validateJob"
+    decider="validJobDecider">
+
+    <next on="VALID" to="clientWorkflowOff" />
+    <fail on="INVALID" exit-code="VALIDATION_FAILED" />
+</batch:decision>
+
+<batch:step id="clientWorkflowOff"
+    next="deleteBeforeWriteDecision">
+
+    <batch:tasklet ref="clientWorkflowOffTasklet"
+        transaction-manager="clientTransactionManager"/>
+</batch:step>
+```
+--
+
+== !Job3
+
+[.em06]
+--
+```xml
+<batch:decision id="deleteBeforeWriteDecision"
+    decider="deleteBeforeWriteDecider">
+
+    <next on="NO" to="startHttpConnection"/>
+    <next on="YES" to="deleteBeforeWrite" />
+</batch:decision>
+
+<batch:step id="deleteBeforeWrite"
+    next="startHttpConnection">
+
+    <batch:tasklet ref="deleteBeforeWriteTasklet"
+        transaction-manager="clientTransactionManager"/>
+</batch:step>
+
+<batch:step id="startHttpConnection"
+    next="clientNamespaceSync">
+
+    <batch:tasklet ref="createHttpConnectionTasklet"
+        transaction-manager="clientTransactionManager"/>
+</batch:step>
+
+```
+--
+
+== !Job4
+
+[.em08]
+--
+```xml
+<!-- Writes JCR namespaces streamed from the server-->
+<batch:step id="clientNamespaceSync"
+    next="clientJcrNodes">
+
+    <batch:tasklet ref="clientNamespaceSyncTasklet"
+        transaction-manager="clientTransactionManager"/>
+</batch:step>
+```
+--
+
+== !Job5
+
+[.em08]
+--
+```xml
+<batch:step id="clientJcrNodes" next="clientWorkflowOn">
+    <batch:tasklet
+        transaction-manager="clientTransactionManager">
+        <batch:chunk reader="clientProtobufNodesReader"
+            writer="clientJcrNodesWriter"
+            commit-interval="#{jobParameters[batchSize]}"
+            skip-limit="0"/>
+        <listeners>
+            <listener ref="loggingStepExecutionListener"/>
+        </listeners>
+    </batch:tasklet>
+</batch:step>
+```
+--
+
+== !ReaderWriter
+
+[.em08]
+--
+```xml
+<!-- Read ProtoBuf message -->
+<bean id="clientProtobufNodesReader"
+    class="c.t.g.c.batch.steps.jcrnodes.JcrNodesReader"/>
+
+<!-- Write JCR node -->
+<bean id="clientJcrNodesWriter"
+    class="c.t.g.c.batch.steps.jcrnodes.JcrNodesWriter"/>
+```
+--
+
+== !Job6
+
+[.em08]
+--
+```xml
+<!-- uses a countdown latch to make sure all other jobs
+     that turned off the workflow have finished -->
+<batch:step id="clientWorkflowOn">
+    <batch:tasklet ref="clientWorkflowOnTasklet"
+        transaction-manager="clientTransactionManager"/>
+</batch:step>
+
+<!-- job lifecycle setup/cleanup -->
+<batch:listeners>
+    <listener ref="clientBatchJobListener"/>
+</batch:listeners>
+```
+--
+
+== !Batch Activity
+
+[.fullheight]
+--
+[plantuml,batch-activity,svg]
+....
+start
+if (valid job?) then (VALID)
+  :clientWorkflowOff|
+  if (delete before write?) then (YES)
+    :deleteBeforeWrite|
+  else (NO)
+  endif
+  :startHttpConnection|
+  :clientNamespaceSync|
+  :clientJcrNodes;
+  note right
+    send "chunks" of nodes
+  end note
+  :clientWorkflowOn|
+  stop
+else (INVALID)
+  :VALIDATION_FAILED/
+  end
+endif
+....
+--
+
+== !Sample Topology
+
+[.fullheight]
+--
+[plantuml,sample-topology,svg]
+....
+database ProdStage
+
+database DW
+
+cloud LowerEnv {
+  database beta
+  database UAT
+}
+
+cloud Workstations {
+    database dev1
+    database dev2
+    database dev3
+}
+
+ProdStage --> DW
+DW --> beta
+DW --> UAT
+DW --> dev1
+DW --> dev2
+DW --> dev3
+....
+--

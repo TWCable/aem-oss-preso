@@ -1,0 +1,137 @@
+== CQ/AEM Gradle Plugins
+
+== !Purpose
+
+Bridges the gap with Maven’s CQ support
+
+== !repository
+
+[.em06]
+--
+```groovy
+buildscript {
+    repositories {
+        maven {
+            url "http://dl.bintray.com/twcable/aem"
+        }
+        dependencies {
+            classpath "com.twcable.gradle:gradle-plugin-scr:1.1.0"
+            classpath "com.twcable.gradle:gradle-plugin-cq-bundle:2.1.0"
+            classpath "com.twcable.gradle:gradle-plugin-cq-package:2.1.0"
+        }
+    }
+}
+
+apply plugin: "com.twcable.scr"
+apply plugin: "com.twcable.cq-bundle"
+apply plugin: "com.twcable.cq-package"
+```
+--
+
+== gradle-plugin-scr
+
+== !Purpose
+
+Adds the `processScrAnnotations` task to processes the @SCR annotations and
+create the appropriate OSGi metadata for OSGi Declarative Services
+
+== gradle-plugin-cq-bundle
+
+== !Tasks
+
+[.em07]
+--
+[horizontal]
+uploadBundle::
+  Uploads the bundle to the CQ server. The task will fail if the bundle fails to start.
+
+startBundle::
+  Start the bundle on the servers. This task will fail if the bundle does
+  not exist on the server.
+
+stopBundle::
+  Stop the bundle on the servers. This task will **_not_** fail if the bundle
+  does not exist on the server.
+
+removeBundle::
+  Uninstalls and deletes the bundle on the servers. This task will **_not_**
+  fail if the bundle does not exist on the server.
+
+refreshAllBundles::
+  Tells CQ to refresh all the bundles. This gets added to the top-level
+  project and generally a good idea to run after any of the other tasks.
+--
+
+== gradle-plugin-cq-package
+
+== !Tasks
+
+[.em07]
+--
+[horizontal]
+createPackage::
+  This will create vault package, adding special features to make it easier
+  to work with for the specifics that CQ wants.
+
+uploadPackage::
+  Upload the package to all the servers defined by the `slingServers`
+  configuration. If the package already exists (even as a "-SNAPSHOT"), you probably want to uninstall and remove it before uploading a new one. See
+http://blog.mooregreatsoftware.com/2015/07/21/aem-6-dot-1-packages-and-bundles-installing-and-uninstalling-behavior/[AEM 6.1 Packages and Bundles - Installing and Uninstalling Behavior]
+for much more information on why. For that reason it depends on `removePackage` by default.
+--
+
+== !Tasks2
+
+[.em07]
+--
+[horizontal]
+installPackage::
+  Installs the CQ Package that has been uploaded.
+
+uninstallPackage::
+  Uninstalls the CQ Package. **If the package is not on the server, nothing happens.**
+  (i.e., This does not fail if the package is not on the server.)
+
+removePackage::
+  Removes the package from CQ. **Does not fail if the package was not on the
+  server to begin with.** This depends on `uninstallPackage` so that the old
+  content is not left behind.
+--
+
+== !Tasks for Bundles In Packages
+
+[.em07]
+--
+[horizontal]
+validateBundles::
+  Checks all the JARs that are included in this package to make sure they
+  are installed and in an ACTIVE state. Gives a report of any that are not.
+  This task polls using the server settings for retries and max time in the
+  case the bundles are newly installed.
+
+validateRemoteBundles::
+  The same as validateBundles but downloads the package as it exists on
+  the remote server, then extracts it to get the bundles inside it.
+
+uninstallBundles::
+  Downloads the currently installed package .zip file if it exists, compiles
+  a list of bundles based off what is currently installed, then stops and
+  uninstalls each bundles individually.
+--
+
+== !Support Tasks
+
+[.em08]
+--
+[horizontal]
+addBundlesToFilterXml::
+  Adds the bundles to the filter.xml
+
+verifyBundles::
+  Checks all the JARs that are included in this package to make sure they
+  are OSGi compliant, and gives a report of any that are not.
+  Never causes the build to fail.
+
+startInactiveBundles::
+  Asynchronously attempts to start any bundle in a RESOLVED state.
+--

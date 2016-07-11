@@ -1,0 +1,43 @@
+= 2016-07 Open Source for Adobe Experience Manager
+:!sectids:
+:imagesdir: images
+:linkattrs:
+:icons: font
+:imagesoutdir: ../public/images
+:source-highlighter: pygments
+
+== !Code Location
+
+https://github.com/TWCable/
+
+== !Clarification
+
+image::Charter_Communications_Logo.png[]
++++<br />+++
+Time Warner Cable was acquired by Charter Communications in May 2016
+
+== !Why
+
+Why open-source what we’ve so worked hard on?
+
+== !OSS Reasons
+
+* Hoping to encourage the community to innovate on higher-value things by
+  getting this stuff out of the way
+* Encouraging others to help make the tooling better
+* Show a glimpse of some of the cool work we're doing and how much we value
+  engineers doing original and interesting projects
+
+== Agenda
+
+* Jackalope
+* Gradle Plugins
+* Grabbit
+
+include::jackalope.adoc[]
+
+include::GradlePlugins.adoc[]
+
+include::grabbit.adoc[]
+
+== Q & A
