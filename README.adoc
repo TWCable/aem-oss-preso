@@ -1,0 +1,48 @@
+# Purpose
+
+A presentation on Charter Communication's (formerly Time Warner Cable) Open Source for Adobe Experience Manager projects.
+
+Currently under development.
+
+////
+
+To view go to https://TWCable.github.io/aem-oss-preso/
+
+# Building
+
+## Setup
+```
+npm install -g gulp-cli
+bundle && npm i
+```
+
+## Building
+
+```
+gulp
+```
+
+## Local Web server
+
+```
+gulp serve
+```
+
+## Publish GH-Pages
+
+```
+gulp deploy
+```
+
+
+# Software This Uses
+
+* http://markdalgleish.com/projects/bespoke.js/[Bespoke], a framework for easily creating beautiful presentations using HTML.
+* https://github.com/asciidoctor/asciidoctor-bespoke[Asciidoctor Bespoke]
+
+## Licenses
+
+* The presentation content is [CC Attribution 4.0 licensed](http://creativecommons.org/licenses/by/4.0/), Copyright (C) 2016 Jim J. Moore and John Zeren for Charter Communication Corp.
+* Bespoke.js is MIT licensed
+
+////
