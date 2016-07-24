@@ -263,6 +263,7 @@ than <code>vlt rcp</code></span></li></ul></li><li><span class="primary">space e
 <section><h2>Grabbit Cons</h2><ul><li><span class="primary">&#8220;edge cases&#8221; are not fully supported</span><ul><li><span class="primary">if you can&#8217;t write with the JCR API (e.g., Users/Groups) it may not work</span></li><li><span class="primary">Vault (Package Manager and <code>vlt rcp</code>) are part of Jackrabbit, so it will
 always receive the most love for backwards compatibility, changes to
 implementation details in the JCR, etc.</span></li></ul></li><li><span class="primary">large (multi-GB) paths require special handling</span></li></ul></section>
+<section><h2>Installation</h2><ul><li><span class="primary">Install two packages on both the Client and Server AEM/CQ machines</span><ul><li><span class="primary"><a href="https://bintray.com/artifact/download/twcable/aem/dependencies/Sun-Misc-Fragment-Bundle-1.0.0.zip">Sun-Misc-Fragment-Bundle-1.0.0.zip</a></span></li><li><span class="primary"><a href="https://bintray.com/twcable/aem/Grabbit/_latestVersion">Grabbit.zip</a></span></li></ul></li></ul></section>
 <section><div class="fullheight"><figure class="image"><img src="images/grabbit-top-sequence.svg" alt="grabbit top sequence"></figure></div></section>
 <section><h2>PUT /grabbit/job</h2></section>
 <section><div class="em07"><pre class="source"><code data-lang="yaml" class="language-yaml prettyprint"><span class="tok-c1"># Information for connecting to the source content</span>
@@ -293,6 +294,24 @@ implementation details in the JCR, etc.</span></li></ul></li><li><span class="pr
       <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">someContent/someExcludeContent</span>
       <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">someContent/someOtherExcludeContent</span>
     <span class="tok-l-Scalar-Plain">workflowConfigIds</span> <span class="tok-p-Indicator">:</span> <span class="tok-nv">*damWorkflows</span></code></pre></div></section>
+<section><p>GET
+/grabbit/job/all.json</p>
+<p>GET
+/grabbit/job/&lt;id&gt;.json</p></section>
+<section><div class="em07"><pre class="source"><code data-lang="json" class="language-json prettyprint"><span class="tok-p">{</span>
+    <span class="tok-nt">&quot;transactionID&quot;</span><span class="tok-p">:</span> <span class="tok-mi">4364570344328332300</span><span class="tok-p">,</span>
+    <span class="tok-nt">&quot;jobExecutionId&quot;</span><span class="tok-p">:</span> <span class="tok-mi">3416428771481128000</span><span class="tok-p">,</span>
+    <span class="tok-nt">&quot;jcrNodesWritten&quot;</span><span class="tok-p">:</span> <span class="tok-mi">1</span><span class="tok-p">,</span>
+    <span class="tok-nt">&quot;exitStatus&quot;</span><span class="tok-p">:</span> <span class="tok-p">{</span>
+        <span class="tok-nt">&quot;exitDescription&quot;</span><span class="tok-p">:</span> <span class="tok-s2">&quot;&quot;</span><span class="tok-p">,</span>
+        <span class="tok-nt">&quot;exitCode&quot;</span><span class="tok-p">:</span> <span class="tok-s2">&quot;COMPLETED&quot;</span><span class="tok-p">,</span>
+        <span class="tok-nt">&quot;running&quot;</span><span class="tok-p">:</span> <span class="tok-kc">false</span>
+    <span class="tok-p">},</span>
+    <span class="tok-nt">&quot;endTime&quot;</span><span class="tok-p">:</span> <span class="tok-s2">&quot;2016-04-25T16:01:46+0000&quot;</span><span class="tok-p">,</span>
+    <span class="tok-nt">&quot;timeTaken&quot;</span><span class="tok-p">:</span> <span class="tok-mi">4212</span><span class="tok-p">,</span>
+    <span class="tok-nt">&quot;path&quot;</span><span class="tok-p">:</span> <span class="tok-s2">&quot;/content/campaigns/jcr:content&quot;</span><span class="tok-p">,</span>
+    <span class="tok-nt">&quot;startTime&quot;</span><span class="tok-p">:</span> <span class="tok-s2">&quot;2016-04-25T16:01:42+0000&quot;</span>
+<span class="tok-p">}</span></code></pre></div></section>
 <section><h2>Google&#8217;s Protocol Buffers</h2><p>Pros</p>
 <ul><li><span class="primary">efficient for both space and time</span><ul><li><span class="primary">binary w/ compression</span></li></ul></li><li><span class="primary">extensible</span></li><li><span class="primary">battle-tested</span></li></ul></section>
 <section><h2>Google&#8217;s Protocol Buffers</h2><p>Cons</p>
