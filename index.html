@@ -1,0 +1,401 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>2016-07 Open Source for Adobe Experience Manager</title><meta name="generator" content="Asciidoctor 1.5.4 (Bespoke.js converter)"><meta name="mobile-web-app-capable" content="yes"><link rel="stylesheet" href="build/build.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css"></head><body><article class="deck"><section class="title" data-title=""><h1>2016-07 Open Source for Adobe Experience Manager</h1></section><section><p><a href="https://github.com/TWCable/" class="bare">https://github.com/TWCable/</a></p></section>
+<section><figure class="image"><img src="images/Charter_Communications_Logo.png" alt="Charter Communications Logo"></figure>
+<p><br />
+Time Warner Cable was acquired by Charter Communications in May 2016</p></section>
+<section><p>Why open-source what we’ve so worked hard on?</p></section>
+<section><ul><li><span class="primary">Hoping to encourage the community to innovate on higher-value things by
+getting this stuff out of the way</span></li><li><span class="primary">Encouraging others to help make the tooling better</span></li><li><span class="primary">Show a glimpse of some of the cool work we&#8217;re doing and how much we value
+engineers doing original and interesting projects</span></li></ul></section>
+<section><h2>Agenda</h2><ul><li><span class="primary">Jackalope</span></li><li><span class="primary">Gradle Plugins</span></li><li><span class="primary">Grabbit</span></li></ul></section>
+<section><figure class="image"><img src="images/jackalope.png" alt="jackalope" height="360"></figure></section>
+<section><h2>Simple test doubles for the JCR/Sling/CQ</h2></section>
+<section><p>Focus on simplicity, speed and clarity</p></section>
+<section><h2>Basic Jackalope Examples</h2></section>
+<section><div class="em07"><pre class="source"><code data-lang="groovy" class="language-groovy prettyprint"><span class="tok-kn">import</span> <span class="tok-nn">static</span> <span class="tok-n">com</span><span class="tok-o">.</span><span class="tok-na">twcable</span><span class="tok-o">.</span><span class="tok-na">jackalope</span><span class="tok-o">.</span><span class="tok-na">JCRBuilder</span><span class="tok-o">.</span><span class="tok-na">node</span> <span class="tok-k">as</span> <span class="tok-n">n</span><span class="tok-err"> </span>
+<span class="tok-kn">import</span> <span class="tok-nn">static</span> <span class="tok-n">com</span><span class="tok-o">.</span><span class="tok-na">twcable</span><span class="tok-o">.</span><span class="tok-na">jackalope</span><span class="tok-o">.</span><span class="tok-na">JCRBuilder</span><span class="tok-o">.</span><span class="tok-na">property</span> <span class="tok-k">as</span> <span class="tok-n">p</span><span class="tok-err"> </span>
+<span class="tok-kn">import</span> <span class="tok-nn">static</span> <span class="tok-n">com</span><span class="tok-o">.</span><span class="tok-na">twcable</span><span class="tok-o">.</span><span class="tok-na">jackalope</span><span class="tok-o">.</span><span class="tok-na">JCRBuilder</span><span class="tok-o">.</span><span class="tok-na">repository</span><span class="tok-err">  </span></code></pre></div>
+<aside role="note"><p>Using Groovy’s “import as” to get rid of some noise</p></aside></section>
+<section><div class="em07"><pre class="source"><code data-lang="groovy" class="language-groovy prettyprint"><span class="tok-err"> </span><span class="tok-kt">def</span> <span class="tok-n">repository</span> <span class="tok-o">=</span> <span class="tok-n">repository</span><span class="tok-o">(</span><span class="tok-err"> </span>
+  <span class="tok-n">n</span><span class="tok-o">(</span><span class="tok-s2">&quot;content&quot;</span><span class="tok-o">,</span>
+    <span class="tok-n">n</span><span class="tok-o">(</span><span class="tok-s2">&quot;test1&quot;</span><span class="tok-o">,</span>
+      <span class="tok-n">n</span><span class="tok-o">(</span><span class="tok-s2">&quot;callingrates&quot;</span><span class="tok-o">,</span>
+        <span class="tok-n">n</span><span class="tok-o">(</span><span class="tok-s2">&quot;intl-direct-dial&quot;</span><span class="tok-o">,</span>
+          <span class="tok-n">p</span><span class="tok-o">(</span><span class="tok-s2">&quot;sling:resourceType&quot;</span><span class="tok-o">,</span>
+            <span class="tok-s2">&quot;admin/components/content/callingratetable&quot;</span><span class="tok-o">),</span>
+          <span class="tok-n">n</span><span class="tok-o">(</span><span class="tok-s2">&quot;france&quot;</span><span class="tok-o">,</span>
+            <span class="tok-n">p</span><span class="tok-o">(</span><span class="tok-s2">&quot;sling:resourceType&quot;</span><span class="tok-o">,</span>
+              <span class="tok-s2">&quot;admin/components/content/callingrate&quot;</span><span class="tok-o">),</span>
+            <span class="tok-n">p</span><span class="tok-o">(</span><span class="tok-s2">&quot;additional-minute-rate&quot;</span><span class="tok-o">,</span> <span class="tok-s2">&quot;0.60&quot;</span><span class="tok-o">))))))).</span><span class="tok-na">build</span><span class="tok-o">()</span>
+
+<span class="tok-kt">def</span> <span class="tok-n">resolver</span> <span class="tok-o">=</span> <span class="tok-k">new</span> <span class="tok-n">SimpleResourceResolverFactory</span><span class="tok-o">(</span><span class="tok-n">repository</span><span class="tok-o">).</span>
+                     <span class="tok-n">administrativeResourceResolver</span><span class="tok-err"> </span>
+<span class="tok-kt">def</span> <span class="tok-n">resource</span> <span class="tok-o">=</span> <span class="tok-n">resolver</span><span class="tok-o">.</span><span class="tok-na">getResource</span><span class="tok-o">(</span><span class="tok-s2">&quot;/content/test1/&quot;</span> <span class="tok-o">+</span>
+                  <span class="tok-s2">&quot;callingrates/intl-direct-dial&quot;</span><span class="tok-o">)</span><span class="tok-err">  </span></code></pre></div>
+<aside role="note"><p>Using Groovy’s properties support to get rid of some noise</p>
+<p>Extremely easy to physically see the structure/hierarchy. Could have done n(“/content/test1/callingrates/intl-direct-dial”), but broke it apart to make the hierarchy obvious.</p>
+<p>Handles taking care of Nodes as Resources</p></aside></section>
+<section><div class="em06"><pre class="source"><code data-lang="groovy" class="language-groovy prettyprint"><span class="tok-kn">import</span> <span class="tok-nn">static</span> <span class="tok-n">com</span><span class="tok-o">.</span><span class="tok-na">twcable</span><span class="tok-o">.</span><span class="tok-na">jackalope</span><span class="tok-o">.</span><span class="tok-na">JCRBuilder</span><span class="tok-o">.</span><span class="tok-na">node</span>
+<span class="tok-err"> </span><span class="tok-kn">import</span> <span class="tok-nn">static</span> <span class="tok-n">com</span><span class="tok-o">.</span><span class="tok-na">twcable</span><span class="tok-o">.</span><span class="tok-na">jackalope</span><span class="tok-o">.</span><span class="tok-na">JCRQueryBuilder</span><span class="tok-o">.</span><span class="tok-na">query</span>
+<span class="tok-err"> </span><span class="tok-kn">import</span> <span class="tok-nn">static</span> <span class="tok-n">com</span><span class="tok-o">.</span><span class="tok-na">twcable</span><span class="tok-o">.</span><span class="tok-na">jackalope</span><span class="tok-o">.</span><span class="tok-na">JCRQueryBuilder</span><span class="tok-o">.</span><span class="tok-na">result</span>
+
+<span class="tok-err">  </span><span class="tok-nl">given:</span>
+<span class="tok-err"> </span><span class="tok-kt">def</span> <span class="tok-n">node</span> <span class="tok-o">=</span> <span class="tok-n">node</span><span class="tok-o">(</span><span class="tok-s2">&quot;result&quot;</span><span class="tok-o">).</span><span class="tok-na">build</span><span class="tok-o">()</span>
+<span class="tok-err"> </span><span class="tok-kt">def</span> <span class="tok-n">session</span> <span class="tok-o">=</span> <span class="tok-n">node</span><span class="tok-o">.</span><span class="tok-na">session</span><span class="tok-err">  </span>
+
+<span class="tok-n">JCRQueryBuilder</span><span class="tok-o">.</span><span class="tok-na">queryManager</span><span class="tok-o">(</span><span class="tok-n">session</span><span class="tok-o">,</span>
+                             <span class="tok-n">query</span><span class="tok-o">(</span><span class="tok-s2">&quot;SELECT ...&quot;</span><span class="tok-o">,</span>
+                                   <span class="tok-n">JCR_SQL2</span><span class="tok-o">,</span> <span class="tok-n">result</span><span class="tok-o">(</span><span class="tok-n">node</span><span class="tok-o">))</span>
+<span class="tok-o">).</span><span class="tok-na">build</span><span class="tok-o">()</span>
+
+<span class="tok-err"> </span><span class="tok-nl">when:</span>
+<span class="tok-err"> </span><span class="tok-kt">def</span> <span class="tok-n">queryResult</span> <span class="tok-o">=</span> <span class="tok-n">session</span><span class="tok-o">.</span><span class="tok-na">workspace</span><span class="tok-o">.</span><span class="tok-na">queryManager</span><span class="tok-o">.</span>
+                    <span class="tok-n">createQuery</span><span class="tok-o">(</span><span class="tok-s2">&quot;SELECT ...&quot;</span><span class="tok-o">,</span> <span class="tok-n">JCR_SQL2</span><span class="tok-o">).</span><span class="tok-na">execute</span><span class="tok-o">()</span><span class="tok-err"> </span>
+
+<span class="tok-err"> </span><span class="tok-nl">then:</span>
+<span class="tok-err"> </span><span class="tok-n">queryResult</span><span class="tok-o">.</span><span class="tok-na">nodes</span><span class="tok-o">.</span><span class="tok-na">first</span><span class="tok-o">()</span> <span class="tok-o">==</span> <span class="tok-n">node</span></code></pre></div>
+<aside role="note"><p>A Session is automatically created for the Node, and the Session is implicitly part of a Workspace</p>
+<p>The QueryManager is &#8220;attached&#8221; to the Session that gets created for the Node</p></aside></section>
+<section><h2>Primary Jackalope Alternatives</h2><ul><li><span class="primary"><a href="https://github.com/Citytechinc/prosper">CITYTECH&#8217;s Prosper</a></span><ul><li><span class="primary">Very Groovy and dynamic DSL</span></li></ul></li><li><span class="primary"><a href="https://sling.apache.org/documentation/development/jcr-mock.html">Sling JCR Mocks</a></span><ul><li><span class="primary">Essentially the &#8220;normal&#8221; API</span></li><li><span class="primary">Verbose and does not &#8220;show&#8221; the structure</span></li></ul></li></ul></section>
+<section><h2>CQ/AEM Gradle Plugins</h2></section>
+<section><p>Bridges the gap with Maven’s CQ support</p></section>
+<section><div class="em06"><pre class="source"><code data-lang="groovy" class="language-groovy prettyprint"><span class="tok-n">buildscript</span> <span class="tok-o">{</span>
+    <span class="tok-n">repositories</span> <span class="tok-o">{</span>
+        <span class="tok-n">maven</span> <span class="tok-o">{</span>
+            <span class="tok-n">url</span> <span class="tok-s2">&quot;http://dl.bintray.com/twcable/aem&quot;</span>
+        <span class="tok-o">}</span>
+        <span class="tok-n">dependencies</span> <span class="tok-o">{</span>
+            <span class="tok-n">classpath</span> <span class="tok-s2">&quot;com.twcable.gradle:gradle-plugin-scr:1.1.0&quot;</span>
+            <span class="tok-n">classpath</span> <span class="tok-s2">&quot;com.twcable.gradle:gradle-plugin-cq-bundle:2.1.0&quot;</span>
+            <span class="tok-n">classpath</span> <span class="tok-s2">&quot;com.twcable.gradle:gradle-plugin-cq-package:2.1.0&quot;</span>
+        <span class="tok-o">}</span>
+    <span class="tok-o">}</span>
+<span class="tok-o">}</span>
+
+<span class="tok-n">apply</span> <span class="tok-nl">plugin:</span> <span class="tok-s2">&quot;com.twcable.scr&quot;</span>
+<span class="tok-n">apply</span> <span class="tok-nl">plugin:</span> <span class="tok-s2">&quot;com.twcable.cq-bundle&quot;</span>
+<span class="tok-n">apply</span> <span class="tok-nl">plugin:</span> <span class="tok-s2">&quot;com.twcable.cq-package&quot;</span></code></pre></div></section>
+<section><h2>gradle-plugin-scr</h2></section>
+<section><p>Adds the <code>processScrAnnotations</code> task to processes the @SCR annotations and
+create the appropriate OSGi metadata for OSGi Declarative Services</p></section>
+<section><h2>gradle-plugin-cq-bundle</h2></section>
+<section><div class="em07"><div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+uploadBundle
+</td>
+<td class="hdlist2">
+<p>Uploads the bundle to the CQ server. The task will fail if the bundle fails to start.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+startBundle
+</td>
+<td class="hdlist2">
+<p>Start the bundle on the servers. This task will fail if the bundle does
+not exist on the server.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+stopBundle
+</td>
+<td class="hdlist2">
+<p>Stop the bundle on the servers. This task will <strong><em>not</em></strong> fail if the bundle
+does not exist on the server.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+removeBundle
+</td>
+<td class="hdlist2">
+<p>Uninstalls and deletes the bundle on the servers. This task will <strong><em>not</em></strong>
+fail if the bundle does not exist on the server.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+refreshAllBundles
+</td>
+<td class="hdlist2">
+<p>Tells CQ to refresh all the bundles. This gets added to the top-level
+project and generally a good idea to run after any of the other tasks.</p>
+</td>
+</tr>
+</table>
+</div></div></section>
+<section><h2>gradle-plugin-cq-package</h2></section>
+<section><div class="em07"><div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+createPackage
+</td>
+<td class="hdlist2">
+<p>This will create vault package, adding special features to make it easier
+to work with for the specifics that CQ wants.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+uploadPackage
+</td>
+<td class="hdlist2">
+<p>  Upload the package to all the servers defined by the <code>slingServers</code>
+  configuration. If the package already exists (even as a "-SNAPSHOT"), you probably want to uninstall and remove it before uploading a new one. See
+<a href="http://blog.mooregreatsoftware.com/2015/07/21/aem-6-dot-1-packages-and-bundles-installing-and-uninstalling-behavior/">AEM 6.1 Packages and Bundles - Installing and Uninstalling Behavior</a>
+for much more information on why. For that reason it depends on <code>removePackage</code> by default.</p>
+</td>
+</tr>
+</table>
+</div></div></section>
+<section><div class="em07"><div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+installPackage
+</td>
+<td class="hdlist2">
+<p>Installs the CQ Package that has been uploaded.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+uninstallPackage
+</td>
+<td class="hdlist2">
+<p>Uninstalls the CQ Package. <strong>If the package is not on the server, nothing happens.</strong>
+(i.e., This does not fail if the package is not on the server.)</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+removePackage
+</td>
+<td class="hdlist2">
+<p>Removes the package from CQ. <strong>Does not fail if the package was not on the
+server to begin with.</strong> This depends on <code>uninstallPackage</code> so that the old
+content is not left behind.</p>
+</td>
+</tr>
+</table>
+</div></div></section>
+<section><div class="em07"><div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+validateBundles
+</td>
+<td class="hdlist2">
+<p>Checks all the JARs that are included in this package to make sure they
+are installed and in an ACTIVE state. Gives a report of any that are not.
+This task polls using the server settings for retries and max time in the
+case the bundles are newly installed.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+validateRemoteBundles
+</td>
+<td class="hdlist2">
+<p>The same as validateBundles but downloads the package as it exists on
+the remote server, then extracts it to get the bundles inside it.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+uninstallBundles
+</td>
+<td class="hdlist2">
+<p>Downloads the currently installed package .zip file if it exists, compiles
+a list of bundles based off what is currently installed, then stops and
+uninstalls each bundles individually.</p>
+</td>
+</tr>
+</table>
+</div></div></section>
+<section><div class="em08"><div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+addBundlesToFilterXml
+</td>
+<td class="hdlist2">
+<p>Adds the bundles to the filter.xml</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+verifyBundles
+</td>
+<td class="hdlist2">
+<p>Checks all the JARs that are included in this package to make sure they
+are OSGi compliant, and gives a report of any that are not.
+Never causes the build to fail.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+startInactiveBundles
+</td>
+<td class="hdlist2">
+<p>Asynchronously attempts to start any bundle in a RESOLVED state.</p>
+</td>
+</tr>
+</table>
+</div></div></section>
+<section><h2>Grabbit</h2></section>
+<section><h2>Fast Content Copy for AEM</h2></section>
+<section><h2>Background</h2></section>
+<section><h2>The Primary Alternatives</h2><ul><li><span class="primary">Package Manager</span></li><li><span class="primary"><code>vlt rcp</code> (and Mark Adamcin&#8217;s &#8220;recap&#8221;)</span></li></ul></section>
+<section><h2>Package Manager Pros</h2><ul><li><span class="primary">it works out the box</span></li><li><span class="primary">handles all the edge-cases</span></li><li><span class="primary">well documented (well, kinda-sorta)</span></li><li><span class="primary">fast</span></li></ul></section>
+<section><h2>Package Manager Cons</h2><ul><li><span class="primary">no (realistic) deltas</span></li><li><span class="primary"><strong><em>EXTREMELY</em></strong> space-inefficient</span><ul><li><span class="primary">sheer space</span></li><li><span class="primary">generates a lot of extra I/O</span></li></ul></li><li><span class="primary">gets wonky with packages in the GB range</span></li></ul></section>
+<section><h2>vlt rcp Pros</h2><ul><li><span class="primary">it works out the box</span></li><li><span class="primary">handles all the edge-cases</span></li><li><span class="primary">space efficient</span></li><li><span class="primary">not too horribly slow when all machines are on the same network</span></li></ul></section>
+<section><h2>vlt rcp Cons</h2><ul><li><span class="primary">very sensitive to network latency (terrible on a WAN/cloud)</span></li><li><span class="primary">when something goes wrong, the error messages are pretty bad</span></li></ul></section>
+<section><h2>What is Grabbit?</h2></section>
+<section><p>Grabbit is focussed on speed, reliability and monitoring</p></section>
+<section><p>Not intended to <em>replace</em> Packages</p>
+<p>Should do the ~90% of keeping content up-to-date</p></section>
+<section><h2>Grabbit Pros</h2><ul><li><span class="primary">data-transfer is very, very optimized</span><ul><li><span class="primary">network topology matters very little</span></li><li><span class="primary">depending on the kind of data and network, generally see 200%-1,000% faster
+than <code>vlt rcp</code></span></li></ul></li><li><span class="primary">space efficient</span></li><li><span class="primary">deltas</span></li><li><span class="primary">clear-before-write</span></li></ul></section>
+<section><h2>Grabbit Cons</h2><ul><li><span class="primary">&#8220;edge cases&#8221; are not fully supported</span><ul><li><span class="primary">if you can&#8217;t write with the JCR API (e.g., Users/Groups) it may not work</span></li><li><span class="primary">Vault (Package Manager and <code>vlt rcp</code>) are part of Jackrabbit, so it will
+always receive the most love for backwards compatibility, changes to
+implementation details in the JCR, etc.</span></li></ul></li><li><span class="primary">large (multi-GB) paths require special handling</span></li></ul></section>
+<section><div class="fullheight"><figure class="image"><img src="images/grabbit-top-sequence.svg" alt="grabbit top sequence"></figure></div></section>
+<section><h2>PUT /grabbit/job</h2></section>
+<section><div class="em07"><pre class="source"><code data-lang="yaml" class="language-yaml prettyprint"><span class="tok-c1"># Information for connecting to the source content</span>
+<span class="tok-l-Scalar-Plain">serverUsername</span> <span class="tok-p-Indicator">:</span> <span class="tok-s">&#39;&lt;username&gt;&#39;</span>
+<span class="tok-l-Scalar-Plain">serverPassword</span> <span class="tok-p-Indicator">:</span> <span class="tok-s">&#39;&lt;password&gt;&#39;</span>
+<span class="tok-l-Scalar-Plain">serverHost</span> <span class="tok-p-Indicator">:</span> <span class="tok-l-Scalar-Plain">some.other.server</span>
+<span class="tok-l-Scalar-Plain">serverPort</span> <span class="tok-p-Indicator">:</span> <span class="tok-l-Scalar-Plain">4502</span>
+
+<span class="tok-l-Scalar-Plain">deltaContent</span> <span class="tok-p-Indicator">:</span> <span class="tok-l-Scalar-Plain">true</span> <span class="tok-c1"># default for all the paths</span>
+
+<span class="tok-c1"># A reference to the standard set of workflow configuration ids that</span>
+<span class="tok-c1"># we want to turn off when working with DAM assets.</span>
+<span class="tok-nl">&amp;damWorkflows</span><span class="tok-p-Indicator">:</span>
+  <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">/etc/workflow/launcher/config/update_asset_mod</span>
+  <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">/etc/workflow/launcher/config/update_asset_create</span>
+  <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">/etc/workflow/launcher/config/dam_xmp_nested_writeback</span>
+  <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">/etc/workflow/launcher/config/dam_xmp_writeback</span></code></pre></div></section>
+<section><div class="em07"><pre class="source"><code data-lang="yaml" class="language-yaml prettyprint"><span class="tok-c1"># Each of the paths to include in the copy</span>
+<span class="tok-l-Scalar-Plain">pathConfigurations</span> <span class="tok-p-Indicator">:</span>
+  <span class="tok-p-Indicator">-</span>
+    <span class="tok-l-Scalar-Plain">path</span> <span class="tok-p-Indicator">:</span> <span class="tok-l-Scalar-Plain">/content/someContent</span>
+  <span class="tok-p-Indicator">-</span>
+    <span class="tok-l-Scalar-Plain">path</span> <span class="tok-p-Indicator">:</span> <span class="tok-l-Scalar-Plain">/content/someOtherContent</span>
+    <span class="tok-l-Scalar-Plain">excludePaths</span><span class="tok-p-Indicator">:</span> <span class="tok-p-Indicator">[</span> <span class="tok-nv">someExcludeContent</span> <span class="tok-p-Indicator">]</span>
+  <span class="tok-p-Indicator">-</span>
+    <span class="tok-l-Scalar-Plain">path</span> <span class="tok-p-Indicator">:</span> <span class="tok-l-Scalar-Plain">/content/dam/someDamContent</span>
+    <span class="tok-l-Scalar-Plain">excludePaths</span> <span class="tok-p-Indicator">:</span>
+      <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">someContent/someExcludeContent</span>
+      <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">someContent/someOtherExcludeContent</span>
+    <span class="tok-l-Scalar-Plain">workflowConfigIds</span> <span class="tok-p-Indicator">:</span> <span class="tok-nv">*damWorkflows</span></code></pre></div></section>
+<section><h2>Google&#8217;s Protocol Buffers</h2><p>Pros</p>
+<ul><li><span class="primary">efficient for both space and time</span><ul><li><span class="primary">binary w/ compression</span></li></ul></li><li><span class="primary">extensible</span></li><li><span class="primary">battle-tested</span></li></ul></section>
+<section><h2>Google&#8217;s Protocol Buffers</h2><p>Cons</p>
+<ul><li><span class="primary">Not meant for large (MB) blobs of data</span></li></ul></section>
+<section><div class="em06"><pre><code>message Node {
+    required string name = 1;
+    required Properties properties = 2;
+    repeated Node mandatoryChildNode = 3;
+}
+message Properties {
+    repeated Property property = 1;
+}
+message Property {
+    required string name = 1;
+    required int32 type = 2;
+    optional Value value = 3;
+    optional Values values = 4;
+}
+message Values {
+    repeated Value value = 1;
+}
+message Value {
+    optional string stringValue = 1;
+    optional bytes bytesValue = 2;
+}</code></pre></div></section>
+<section><h2>Processing the Jobs</h2></section>
+<section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-nt">&lt;batch:job</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientJob&quot;</span>
+    <span class="tok-na">xmlns=</span><span class="tok-s">&quot;http://www.springframework.org/schema/batch&quot;</span>
+    <span class="tok-na">job-repository=</span><span class="tok-s">&quot;clientJobRepository&quot;</span><span class="tok-nt">&gt;</span>
+
+    <span class="tok-c">&lt;!-- ... --&gt;</span>
+
+<span class="tok-nt">&lt;/batch:job&gt;</span></code></pre></div></section>
+<section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-nt">&lt;batch:decision</span> <span class="tok-na">id=</span><span class="tok-s">&quot;validateJob&quot;</span>
+    <span class="tok-na">decider=</span><span class="tok-s">&quot;validJobDecider&quot;</span><span class="tok-nt">&gt;</span>
+
+    <span class="tok-nt">&lt;next</span> <span class="tok-na">on=</span><span class="tok-s">&quot;VALID&quot;</span> <span class="tok-na">to=</span><span class="tok-s">&quot;clientWorkflowOff&quot;</span> <span class="tok-nt">/&gt;</span>
+    <span class="tok-nt">&lt;fail</span> <span class="tok-na">on=</span><span class="tok-s">&quot;INVALID&quot;</span> <span class="tok-na">exit-code=</span><span class="tok-s">&quot;VALIDATION_FAILED&quot;</span> <span class="tok-nt">/&gt;</span>
+<span class="tok-nt">&lt;/batch:decision&gt;</span>
+
+<span class="tok-nt">&lt;batch:step</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientWorkflowOff&quot;</span>
+    <span class="tok-na">next=</span><span class="tok-s">&quot;deleteBeforeWriteDecision&quot;</span><span class="tok-nt">&gt;</span>
+
+    <span class="tok-nt">&lt;batch:tasklet</span> <span class="tok-na">ref=</span><span class="tok-s">&quot;clientWorkflowOffTasklet&quot;</span>
+        <span class="tok-na">transaction-manager=</span><span class="tok-s">&quot;clientTransactionManager&quot;</span><span class="tok-nt">/&gt;</span>
+<span class="tok-nt">&lt;/batch:step&gt;</span></code></pre></div></section>
+<section><div class="em06"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-nt">&lt;batch:decision</span> <span class="tok-na">id=</span><span class="tok-s">&quot;deleteBeforeWriteDecision&quot;</span>
+    <span class="tok-na">decider=</span><span class="tok-s">&quot;deleteBeforeWriteDecider&quot;</span><span class="tok-nt">&gt;</span>
+
+    <span class="tok-nt">&lt;next</span> <span class="tok-na">on=</span><span class="tok-s">&quot;NO&quot;</span> <span class="tok-na">to=</span><span class="tok-s">&quot;startHttpConnection&quot;</span><span class="tok-nt">/&gt;</span>
+    <span class="tok-nt">&lt;next</span> <span class="tok-na">on=</span><span class="tok-s">&quot;YES&quot;</span> <span class="tok-na">to=</span><span class="tok-s">&quot;deleteBeforeWrite&quot;</span> <span class="tok-nt">/&gt;</span>
+<span class="tok-nt">&lt;/batch:decision&gt;</span>
+
+<span class="tok-nt">&lt;batch:step</span> <span class="tok-na">id=</span><span class="tok-s">&quot;deleteBeforeWrite&quot;</span>
+    <span class="tok-na">next=</span><span class="tok-s">&quot;startHttpConnection&quot;</span><span class="tok-nt">&gt;</span>
+
+    <span class="tok-nt">&lt;batch:tasklet</span> <span class="tok-na">ref=</span><span class="tok-s">&quot;deleteBeforeWriteTasklet&quot;</span>
+        <span class="tok-na">transaction-manager=</span><span class="tok-s">&quot;clientTransactionManager&quot;</span><span class="tok-nt">/&gt;</span>
+<span class="tok-nt">&lt;/batch:step&gt;</span>
+
+<span class="tok-nt">&lt;batch:step</span> <span class="tok-na">id=</span><span class="tok-s">&quot;startHttpConnection&quot;</span>
+    <span class="tok-na">next=</span><span class="tok-s">&quot;clientNamespaceSync&quot;</span><span class="tok-nt">&gt;</span>
+
+    <span class="tok-nt">&lt;batch:tasklet</span> <span class="tok-na">ref=</span><span class="tok-s">&quot;createHttpConnectionTasklet&quot;</span>
+        <span class="tok-na">transaction-manager=</span><span class="tok-s">&quot;clientTransactionManager&quot;</span><span class="tok-nt">/&gt;</span>
+<span class="tok-nt">&lt;/batch:step&gt;</span></code></pre></div></section>
+<section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-c">&lt;!-- Writes JCR namespaces streamed from the server--&gt;</span>
+<span class="tok-nt">&lt;batch:step</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientNamespaceSync&quot;</span>
+    <span class="tok-na">next=</span><span class="tok-s">&quot;clientJcrNodes&quot;</span><span class="tok-nt">&gt;</span>
+
+    <span class="tok-nt">&lt;batch:tasklet</span> <span class="tok-na">ref=</span><span class="tok-s">&quot;clientNamespaceSyncTasklet&quot;</span>
+        <span class="tok-na">transaction-manager=</span><span class="tok-s">&quot;clientTransactionManager&quot;</span><span class="tok-nt">/&gt;</span>
+<span class="tok-nt">&lt;/batch:step&gt;</span></code></pre></div></section>
+<section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-nt">&lt;batch:step</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientJcrNodes&quot;</span> <span class="tok-na">next=</span><span class="tok-s">&quot;clientWorkflowOn&quot;</span><span class="tok-nt">&gt;</span>
+    <span class="tok-nt">&lt;batch:tasklet</span>
+        <span class="tok-na">transaction-manager=</span><span class="tok-s">&quot;clientTransactionManager&quot;</span><span class="tok-nt">&gt;</span>
+        <span class="tok-nt">&lt;batch:chunk</span> <span class="tok-na">reader=</span><span class="tok-s">&quot;clientProtobufNodesReader&quot;</span>
+            <span class="tok-na">writer=</span><span class="tok-s">&quot;clientJcrNodesWriter&quot;</span>
+            <span class="tok-na">commit-interval=</span><span class="tok-s">&quot;#{jobParameters[batchSize]}&quot;</span>
+            <span class="tok-na">skip-limit=</span><span class="tok-s">&quot;0&quot;</span><span class="tok-nt">/&gt;</span>
+        <span class="tok-nt">&lt;listeners&gt;</span>
+            <span class="tok-nt">&lt;listener</span> <span class="tok-na">ref=</span><span class="tok-s">&quot;loggingStepExecutionListener&quot;</span><span class="tok-nt">/&gt;</span>
+        <span class="tok-nt">&lt;/listeners&gt;</span>
+    <span class="tok-nt">&lt;/batch:tasklet&gt;</span>
+<span class="tok-nt">&lt;/batch:step&gt;</span></code></pre></div></section>
+<section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-c">&lt;!-- Read JCR nodes --&gt;</span>
+<span class="tok-nt">&lt;bean</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientProtobufNodesReader&quot;</span>
+    <span class="tok-na">class=</span><span class="tok-s">&quot;c.t.g.c.batch.steps.jcrnodes.JcrNodesReader&quot;</span><span class="tok-nt">/&gt;</span>
+
+<span class="tok-c">&lt;!-- Write JCR nodes as ProtoBuf on HttpConn --&gt;</span>
+<span class="tok-nt">&lt;bean</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientJcrNodesWriter&quot;</span>
+    <span class="tok-na">class=</span><span class="tok-s">&quot;c.t.g.c.batch.steps.jcrnodes.JcrNodesWriter&quot;</span><span class="tok-nt">/&gt;</span></code></pre></div></section>
+<section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-c">&lt;!-- uses a countdown latch to make sure all other jobs</span>
+<span class="tok-c">     that turned off the workflow have finished --&gt;</span>
+<span class="tok-nt">&lt;batch:step</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientWorkflowOn&quot;</span><span class="tok-nt">&gt;</span>
+    <span class="tok-nt">&lt;batch:tasklet</span> <span class="tok-na">ref=</span><span class="tok-s">&quot;clientWorkflowOnTasklet&quot;</span>
+        <span class="tok-na">transaction-manager=</span><span class="tok-s">&quot;clientTransactionManager&quot;</span><span class="tok-nt">/&gt;</span>
+<span class="tok-nt">&lt;/batch:step&gt;</span>
+
+<span class="tok-c">&lt;!-- job lifecycle setup/cleanup --&gt;</span>
+<span class="tok-nt">&lt;batch:listeners&gt;</span>
+    <span class="tok-nt">&lt;listener</span> <span class="tok-na">ref=</span><span class="tok-s">&quot;clientBatchJobListener&quot;</span><span class="tok-nt">/&gt;</span>
+<span class="tok-nt">&lt;/batch:listeners&gt;</span></code></pre></div></section>
+<section><div class="fullheight"><figure class="image"><img src="images/batch-activity.svg" alt="batch activity"></figure></div></section>
+<section><h2>Questions</h2></section>
+<section><h2>Q &amp; A</h2></section></article><script src="build/build.js"></script></body></html>
