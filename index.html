@@ -378,11 +378,11 @@ message Value {
         <span class="tok-nt">&lt;/listeners&gt;</span>
     <span class="tok-nt">&lt;/batch:tasklet&gt;</span>
 <span class="tok-nt">&lt;/batch:step&gt;</span></code></pre></div></section>
-<section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-c">&lt;!-- Read JCR nodes --&gt;</span>
+<section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-c">&lt;!-- Read ProtoBuf message --&gt;</span>
 <span class="tok-nt">&lt;bean</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientProtobufNodesReader&quot;</span>
     <span class="tok-na">class=</span><span class="tok-s">&quot;c.t.g.c.batch.steps.jcrnodes.JcrNodesReader&quot;</span><span class="tok-nt">/&gt;</span>
 
-<span class="tok-c">&lt;!-- Write JCR nodes as ProtoBuf on HttpConn --&gt;</span>
+<span class="tok-c">&lt;!-- Write JCR node --&gt;</span>
 <span class="tok-nt">&lt;bean</span> <span class="tok-na">id=</span><span class="tok-s">&quot;clientJcrNodesWriter&quot;</span>
     <span class="tok-na">class=</span><span class="tok-s">&quot;c.t.g.c.batch.steps.jcrnodes.JcrNodesWriter&quot;</span><span class="tok-nt">/&gt;</span></code></pre></div></section>
 <section><div class="em08"><pre class="source"><code data-lang="xml" class="language-xml prettyprint"><span class="tok-c">&lt;!-- uses a countdown latch to make sure all other jobs</span>
@@ -397,5 +397,5 @@ message Value {
     <span class="tok-nt">&lt;listener</span> <span class="tok-na">ref=</span><span class="tok-s">&quot;clientBatchJobListener&quot;</span><span class="tok-nt">/&gt;</span>
 <span class="tok-nt">&lt;/batch:listeners&gt;</span></code></pre></div></section>
 <section><div class="fullheight"><figure class="image"><img src="images/batch-activity.svg" alt="batch activity"></figure></div></section>
-<section><h2>Questions</h2></section>
+<section><div class="fullheight"><figure class="image"><img src="images/sample-topology.svg" alt="sample topology"></figure></div></section>
 <section><h2>Q &amp; A</h2></section></article><script src="build/build.js"></script></body></html>
