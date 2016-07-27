@@ -276,7 +276,7 @@ implementation details in the JCR, etc.</span></li></ul></li><li><span class="pr
 
 <span class="tok-c1"># A reference to the standard set of workflow configuration ids that</span>
 <span class="tok-c1"># we want to turn off when working with DAM assets.</span>
-<span class="tok-nl">&amp;damWorkflows</span><span class="tok-p-Indicator">:</span>
+<span class="tok-l-Scalar-Plain">damWorkflows</span><span class="tok-p-Indicator">:</span> <span class="tok-nl">&amp;ourDamWorkflows</span>
   <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">/etc/workflow/launcher/config/update_asset_mod</span>
   <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">/etc/workflow/launcher/config/update_asset_create</span>
   <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">/etc/workflow/launcher/config/dam_xmp_nested_writeback</span>
@@ -293,7 +293,7 @@ implementation details in the JCR, etc.</span></li></ul></li><li><span class="pr
     <span class="tok-l-Scalar-Plain">excludePaths</span> <span class="tok-p-Indicator">:</span>
       <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">someContent/someExcludeContent</span>
       <span class="tok-p-Indicator">-</span> <span class="tok-l-Scalar-Plain">someContent/someOtherExcludeContent</span>
-    <span class="tok-l-Scalar-Plain">workflowConfigIds</span> <span class="tok-p-Indicator">:</span> <span class="tok-nv">*damWorkflows</span></code></pre></div></section>
+    <span class="tok-l-Scalar-Plain">workflowConfigIds</span> <span class="tok-p-Indicator">:</span> <span class="tok-nv">*ourDamWorkflows</span></code></pre></div></section>
 <section><p>GET
 /grabbit/job/all.json</p>
 <p>GET
